@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+npm install
+
+pushd node_modules/vscode-json-languageserver
+../.bin/pkg . -t node16-macos-x64,node16-macos-arm64
+popd
+
+mkdir bin
+mv node_modules/vscode-json-languageserver/vscode-json-languageserver-arm64 ./bin/json-language-server-darwin-aarch64
+mv node_modules/vscode-json-languageserver/vscode-json-languageserver-x64 ./bin/json-language-server-darwin-x86_64
