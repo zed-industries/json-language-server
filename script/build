@@ -8,6 +8,8 @@ popd
 
 rm -rf bin
 mkdir bin
+
+echo "Moving binaries to bin"
 mv node_modules/vscode-json-languageserver/vscode-json-languageserver-arm64 ./bin/json-language-server-darwin-aarch64
 mv node_modules/vscode-json-languageserver/vscode-json-languageserver-x64 ./bin/json-language-server-darwin-x86_64
 
@@ -23,4 +25,6 @@ if [[ -n $MACOS_CERTIFICATE && -n $MACOS_CERTIFICATE_PASSWORD ]]; then
     /usr/bin/codesign --force --deep --timestamp --options runtime --sign "Zed Industries, Inc." ./bin/json-language-server-darwin-aarch64 -v
     /usr/bin/codesign --force --deep --timestamp --options runtime --sign "Zed Industries, Inc." ./bin/json-language-server-darwin-x86_64 -v
     security default-keychain -s login.keychain
+else
+    echo "Skipping codesign"
 fi
