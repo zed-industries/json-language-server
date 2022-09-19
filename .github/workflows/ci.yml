@@ -20,6 +20,10 @@ jobs:
         with:
           node-version: '16'
 
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
       - name: Checkout repo
         uses: actions/checkout@v2
         with:
