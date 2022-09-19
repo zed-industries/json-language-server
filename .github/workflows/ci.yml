@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+  pull_request:
+    branches:
+      - "**"
+
+jobs:
+  build:
+    name: Build binary
+    runs-on: macos-12
+    steps:
+      - name: Install Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          clean: false
+
+      - name: Create binaries
+        run: script/build
+
+      - name: Upload aarch64 binaries to workflow run if main branch
+        uses: actions/upload-artifact@v2
+        with:
+          name: json-language-server-darwin-aarch64
+          path: bin/json-language-server-darwin-aarch64
+
+      - name: Upload x86_64 binaries to workflow run if main branch
+        uses: actions/upload-artifact@v2
+        with:
+          name: json-language-server-darwin-x86_64
+          path: bin/json-language-server-darwin-x86_64
+
+      - uses: softprops/action-gh-release@v1
+        name: Upload app bundle to release if release tag
+        if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+        with:
+          draft: true
+          files: target/release/Zed.dmg
+          overwrite: true
+          body: ""
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
