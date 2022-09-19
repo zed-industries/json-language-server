@@ -3,10 +3,23 @@
 npm install
 
 pushd node_modules/vscode-json-languageserver
-../.bin/pkg . -t node16-macos-x64,node16-macos-arm64 --debug
+../.bin/pkg . -t node16-macos-x64,node16-macos-arm64
 popd
 
 rm -rf bin
 mkdir bin
 mv node_modules/vscode-json-languageserver/vscode-json-languageserver-arm64 ./bin/json-language-server-darwin-aarch64
 mv node_modules/vscode-json-languageserver/vscode-json-languageserver-x64 ./bin/json-language-server-darwin-x86_64
+
+if [[ -n $MACOS_CERTIFICATE && -n $MACOS_CERTIFICATE_PASSWORD ]]; then
+    echo "Signing binaries"
+    security create-keychain -p $MACOS_CERTIFICATE_PASSWORD cert.keychain || echo ""
+    security default-keychain -s cert.keychain
+    security unlock-keychain -p $MACOS_CERTIFICATE_PASSWORD cert.keychain
+    echo $MACOS_CERTIFICATE | base64 --decode > /tmp/certificate.p12
+    security import /tmp/certificate.p12 -k cert.keychain -P $MACOS_CERTIFICATE_PASSWORD -T /usr/bin/codesign
+    rm /tmp/certificate.p12
+    security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $MACOS_CERTIFICATE_PASSWORD cert.keychain
+    /usr/bin/codesign --force --deep --timestamp --options runtime --sign "Zed Industries, Inc." ./bin/json-language-server-darwin-aarch64 -v
+    /usr/bin/codesign --force --deep --timestamp --options runtime --sign "Zed Industries, Inc." ./bin/json-language-server-darwin-x86_64 -v
+fi
