@@ -16,26 +16,14 @@ mv node_modules/vscode-json-languageserver/vscode-json-languageserver-arm64 ./bi
 mv node_modules/vscode-json-languageserver/vscode-json-languageserver-x64 ./bin/json-language-server-darwin-x86_64
 
 if [[ -n $MACOS_CERTIFICATE && -n $MACOS_CERTIFICATE_PASSWORD ]]; then
-    echo "Signing binaries"
-
-    echo "Creating certificate keychain"
     security create-keychain -p $MACOS_CERTIFICATE_PASSWORD zed.keychain || echo ""
     security default-keychain -s zed.keychain
     security unlock-keychain -p $MACOS_CERTIFICATE_PASSWORD zed.keychain
-
-    echo "Exporting certificate to file"
-    echo $MACOS_CERTIFICATE | base64 --decode > /tmp/certificate.p12
-
-    echo "Importing certificate to keychain"
-    security import /tmp/certificate.p12 -k zed.keychain -P $MACOS_CERTIFICATE_PASSWORD -T /usr/bin/codesign
-    rm /tmp/certificate.p12
-
-    echo "Code-signing..."
+    echo $MACOS_CERTIFICATE | base64 --decode > /tmp/zed-certificate.p12
+    security import /tmp/zed-certificate.p12 -k zed.keychain -P $MACOS_CERTIFICATE_PASSWORD -T /usr/bin/codesign
+    rm /tmp/zed-certificate.p12
     security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $MACOS_CERTIFICATE_PASSWORD zed.keychain
-    /usr/bin/codesign --force --deep --timestamp --options runtime --sign "Zed Industries, Inc." ./bin/json-language-server-darwin-aarch64 -v
-    /usr/bin/codesign --force --deep --timestamp --options runtime --sign "Zed Industries, Inc." ./bin/json-language-server-darwin-x86_64 -v
-
-    echo "Resetting default keychain"
+    /usr/bin/codesign --force --deep --timestamp --options runtime --sign "Zed Industries, Inc." bin/json-language-server-darwin-aarch64 -v
     security default-keychain -s login.keychain
 else
     echo "Skipping codesign"
