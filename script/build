@@ -24,11 +24,11 @@ if [[ -n $MACOS_CERTIFICATE && -n $MACOS_CERTIFICATE_PASSWORD ]]; then
     security unlock-keychain -p $MACOS_CERTIFICATE_PASSWORD cert.keychain
 
     echo "Exporting certificate to file"
-    echo $MACOS_CERTIFICATE | base64 --decode > /tmp/certificate.p12
+    echo $MACOS_CERTIFICATE | base64 --decode > /tmp/certificate.cert
 
     echo "Importing certificate to keychain"
-    security import /tmp/certificate.p12 -k cert.keychain -P $MACOS_CERTIFICATE_PASSWORD -T /usr/bin/codesign
-    rm /tmp/certificate.p12
+    security import /tmp/certificate.cert -k cert.keychain -P $MACOS_CERTIFICATE_PASSWORD -T /usr/bin/codesign
+    rm /tmp/certificate.cert
 
     echo "Code-signing"
     security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $MACOS_CERTIFICATE_PASSWORD cert.keychain
