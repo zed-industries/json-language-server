@@ -36,14 +36,14 @@ jobs:
       - name: Upload aarch64 binaries to workflow run if main branch
         uses: actions/upload-artifact@v2
         with:
-          name: json-language-server-darwin-aarch64
-          path: bin/json-language-server-darwin-aarch64
+          name: json-language-server-darwin-aarch64.gz
+          path: bin/json-language-server-darwin-aarch64.gz
 
       - name: Upload x86_64 binaries to workflow run if main branch
         uses: actions/upload-artifact@v2
         with:
-          name: json-language-server-darwin-x86_64
-          path: bin/json-language-server-darwin-x86_64
+          name: json-language-server-darwin-x86_64.gz
+          path: bin/json-language-server-darwin-x86_64.gz
 
       - uses: softprops/action-gh-release@v1
         name: Upload binaries to release if release tag
