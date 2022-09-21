@@ -46,11 +46,11 @@ jobs:
           path: bin/json-language-server-darwin-x86_64
 
       - uses: softprops/action-gh-release@v1
-        name: Upload app bundle to release if release tag
+        name: Upload binaries to release if release tag
         if: ${{ startsWith(github.ref, 'refs/tags/v') }}
         with:
           draft: true
-          files: target/release/Zed.dmg
+          files: bin/*
           overwrite: true
           body: ""
         env:
